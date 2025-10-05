@@ -1,0 +1,6 @@
+streamlit>=1.25
+jinja2
+requests
+beautifulsoup4
+openai
+pyppeteer
