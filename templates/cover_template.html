@@ -1,28 +1,21 @@
-<html>
+<!DOCTYPE html>
+<html lang="de">
 <head>
-<meta charset="utf-8">
-<style>
-  body {
-    font-family: '{{ font }}', sans-serif;
-    margin: 2cm;
-    color: #000;
-  }
-  h1 {
-    color: {{ primary_color }};
-  }
-  h2 {
-    color: {{ primary_color }};
-    border-bottom: 2px solid {{ primary_color }};
-    padding-bottom: 4px;
-  }
-</style>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Helvetica, Arial, sans-serif; color: #333; margin: 3cm; }
+        h1 { color: #003366; font-size: 22px; margin-bottom: 20px; }
+        .footer { margin-top: 40px; font-size: 12px; color: #666; }
+    </style>
 </head>
 <body>
-  <h1>Bewerbung als {{ role }}</h1>
-  <p>Sehr geehrte Damen und Herren,</p>
-  <p>{{ intro }}</p>
-  <p>{{ body }}</p>
-  <p>{{ closing }}</p>
-  <p>Freundliche Grüsse,<br>{{ name }}</p>
+    <p>{{ company }}</p>
+    <h1>Bewerbung als {{ position }}</h1>
+
+    <p style="white-space: pre-line;">{{ motivation_text }}</p>
+
+    <div class="footer">
+        <p>{{ name }}<br>{{ address }}<br>{{ phone }} | {{ email }}</p>
+    </div>
 </body>
 </html>
