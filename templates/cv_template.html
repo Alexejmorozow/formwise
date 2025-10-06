@@ -1,43 +1,37 @@
-<html>
+<!DOCTYPE html>
+<html lang="de">
 <head>
-<meta charset="utf-8">
-<style>
-  body {
-    font-family: '{{ font }}', sans-serif;
-    margin: 2cm;
-    color: #000;
-  }
-  h1 {
-    color: {{ primary_color }};
-    margin-bottom: 0;
-  }
-  h2 {
-    color: {{ primary_color }};
-    border-bottom: 2px solid {{ primary_color }};
-    padding-bottom: 4px;
-  }
-  .contact {
-    font-size: 11pt;
-    margin-bottom: 10px;
-  }
-</style>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Helvetica, Arial, sans-serif; color: #333; margin: 2cm; }
+        h1 { color: #003366; font-size: 24px; border-bottom: 2px solid #003366; padding-bottom: 5px; }
+        h2 { color: #003366; font-size: 18px; margin-top: 20px; }
+        p { margin: 0; line-height: 1.5; }
+        .section { margin-top: 15px; }
+    </style>
 </head>
 <body>
-  <h1>{{ name }}</h1>
-  <div class="contact">{{ contact }}</div>
-  <h2>{{ title }}</h2>
-  <p>{{ profile }}</p>
-  <h2>Erfahrung</h2>
-  <ul>
-    {% for job in experiences %}
-      <li>{{ job }}</li>
-    {% endfor %}
-  </ul>
-  <h2>Fähigkeiten</h2>
-  <ul>
-    {% for skill in skills %}
-      <li>{{ skill }}</li>
-    {% endfor %}
-  </ul>
+    <h1>{{ name }}</h1>
+    <p>{{ address }} | {{ phone }} | {{ email }}</p>
+
+    <div class="section">
+        <h2>Ausbildung</h2>
+        <p>{{ education | nl2br }}</p>
+    </div>
+
+    <div class="section">
+        <h2>Berufserfahrung</h2>
+        <p>{{ experience | nl2br }}</p>
+    </div>
+
+    <div class="section">
+        <h2>Fähigkeiten</h2>
+        <p>{{ skills | nl2br }}</p>
+    </div>
+
+    <div class="section">
+        <h2>Sprachen</h2>
+        <p>{{ languages | nl2br }}</p>
+    </div>
 </body>
 </html>
