@@ -1,37 +1,47 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <style>
-        body { font-family: Helvetica, Arial, sans-serif; color: #333; margin: 2cm; }
-        h1 { color: #003366; font-size: 24px; border-bottom: 2px solid #003366; padding-bottom: 5px; }
-        h2 { color: #003366; font-size: 18px; margin-top: 20px; }
-        p { margin: 0; line-height: 1.5; }
-        .section { margin-top: 15px; }
-    </style>
+<meta charset="UTF-8">
+<style>
+body { font-family: 'Helvetica', Arial, sans-serif; color: #333; margin: 1.5cm; }
+h1 { color: #003366; font-size: 26px; border-bottom: 3px solid #003366; padding-bottom: 5px; margin-bottom: 10px; }
+h2 { color: #003366; font-size: 18px; margin-top: 20px; border-bottom: 1px solid #cfd6e0; padding-bottom: 3px; }
+p { line-height: 1.5; margin: 0 0 6px 0; }
+.section { margin-top: 12px; }
+.two-cols { display: flex; justify-content: space-between; gap: 2rem; }
+.col { flex: 1; }
+hr { border: 0; border-top: 1px solid #ddd; margin: 15px 0; }
+</style>
 </head>
 <body>
-    <h1>{{ name }}</h1>
-    <p>{{ address }} | {{ phone }} | {{ email }}</p>
+<h1>{{ name }}</h1>
+<p>{{ address }} | {{ phone }} | {{ email }}</p>
+<hr>
 
+<div class="two-cols">
+  <div class="col">
     <div class="section">
-        <h2>Ausbildung</h2>
-        <p>{{ education | nl2br }}</p>
+      <h2>Ausbildung</h2>
+      <p style="white-space: pre-line;">{{ education }}</p>
     </div>
 
     <div class="section">
-        <h2>Berufserfahrung</h2>
-        <p>{{ experience | nl2br }}</p>
+      <h2>Berufserfahrung</h2>
+      <p style="white-space: pre-line;">{{ experience }}</p>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="section">
+      <h2>Fähigkeiten</h2>
+      <p style="white-space: pre-line;">{{ skills }}</p>
     </div>
 
     <div class="section">
-        <h2>Fähigkeiten</h2>
-        <p>{{ skills | nl2br }}</p>
+      <h2>Sprachen</h2>
+      <p style="white-space: pre-line;">{{ languages }}</p>
     </div>
-
-    <div class="section">
-        <h2>Sprachen</h2>
-        <p>{{ languages | nl2br }}</p>
-    </div>
+  </div>
+</div>
 </body>
 </html>
