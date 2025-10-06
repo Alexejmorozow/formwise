@@ -1,0 +1,43 @@
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body {
+    font-family: '{{ font }}', sans-serif;
+    margin: 2cm;
+    color: #000;
+  }
+  h1 {
+    color: {{ primary_color }};
+    margin-bottom: 0;
+  }
+  h2 {
+    color: {{ primary_color }};
+    border-bottom: 2px solid {{ primary_color }};
+    padding-bottom: 4px;
+  }
+  .contact {
+    font-size: 11pt;
+    margin-bottom: 10px;
+  }
+</style>
+</head>
+<body>
+  <h1>{{ name }}</h1>
+  <div class="contact">{{ contact }}</div>
+  <h2>{{ title }}</h2>
+  <p>{{ profile }}</p>
+  <h2>Erfahrung</h2>
+  <ul>
+    {% for job in experiences %}
+      <li>{{ job }}</li>
+    {% endfor %}
+  </ul>
+  <h2>Fähigkeiten</h2>
+  <ul>
+    {% for skill in skills %}
+      <li>{{ skill }}</li>
+    {% endfor %}
+  </ul>
+</body>
+</html>
