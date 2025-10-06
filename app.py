@@ -2,25 +2,18 @@ import streamlit as st
 from jinja2 import Environment, FileSystemLoader
 from xhtml2pdf import pisa
 import io
-import os
 
-# === HTML Templates laden ===
 env = Environment(loader=FileSystemLoader("templates"))
 
 def render_pdf(template_name, context):
-    """Rendert HTML + erzeugt PDF"""
     template = env.get_template(template_name)
     html = template.render(context)
     pdf_bytes = io.BytesIO()
     pisa.CreatePDF(io.StringIO(html), dest=pdf_bytes)
     return pdf_bytes.getvalue(), html
 
-
-# === Streamlit App ===
 st.set_page_config(page_title="Formwise – Bewerbungsgenerator", layout="wide")
-
-st.title("💼 Formwise – Bewerbungsgenerator für EBP")
-st.write("Erstelle ein einheitliches, ästhetisches Bewerbungsdossier mit wenigen Klicks.")
+st.title("💼 Formwise – Bewerbungsgenerator (EBP-Edition)")
 
 with st.sidebar:
     st.header("📋 Persönliche Angaben")
@@ -38,7 +31,6 @@ st.divider()
 st.subheader("🧾 Lebenslauf")
 
 col1, col2 = st.columns(2)
-
 with col1:
     education = st.text_area("Ausbildung", "MAS Organisationsentwicklung, Universität Zürich\nBSc Sozialpädagogik, HSLU")
     experience = st.text_area("Berufserfahrung", "Teamleiter, Wohnheim Zürich\nSozialpädagoge, Stiftung XY")
@@ -48,48 +40,31 @@ with col2:
 
 st.divider()
 st.subheader("💬 Motivationsschreiben")
-motivation_text = st.text_area(
-    "Text deines Motivationsschreibens",
-    "Sehr geehrte Damen und Herren,\n\n"
-    "Mit grossem Interesse bewerbe ich mich als Organisationsentwickler bei EBP..."
-)
+motivation_text = st.text_area("Text deines Motivationsschreibens",
+"""Sehr geehrte Damen und Herren,
 
-st.divider()
+Mit grossem Interesse bewerbe ich mich als Organisationsentwickler bei EBP...
+""")
 
 if st.button("📄 Bewerbung generieren"):
-    context_cv = {
-        "name": name,
-        "email": email,
-        "phone": phone,
-        "address": address,
-        "education": education,
-        "experience": experience,
-        "skills": skills,
-        "languages": languages,
-        "company": company,
-        "position": position,
+    ctx_cv = {
+        "name": name, "email": email, "phone": phone, "address": address,
+        "education": education, "experience": experience,
+        "skills": skills, "languages": languages,
+        "company": company, "position": position
     }
-
-    context_cover = {
-        "name": name,
-        "email": email,
-        "phone": phone,
-        "address": address,
+    ctx_cover = {
+        "name": name, "email": email, "phone": phone, "address": address,
         "motivation_text": motivation_text,
-        "company": company,
-        "position": position,
+        "company": company, "position": position
     }
-
-    cv_pdf, cv_html = render_pdf("cv_template.html", context_cv)
-    cover_pdf, cover_html = render_pdf("cover_template.html", context_cover)
+    cv_pdf, cv_html = render_pdf("cv_template.html", ctx_cv)
+    cover_pdf, cover_html = render_pdf("cover_template.html", ctx_cover)
 
     st.success("✅ Bewerbung erfolgreich erstellt!")
-
     st.subheader("📄 Vorschau – Lebenslauf")
     st.components.v1.html(cv_html, height=800, scrolling=True)
-
     st.subheader("📄 Vorschau – Motivationsschreiben")
     st.components.v1.html(cover_html, height=800, scrolling=True)
-
-    st.download_button("⬇️ Lebenslauf herunterladen", data=cv_pdf, file_name="Lebenslauf.pdf", mime="application/pdf")
-    st.download_button("⬇️ Motivationsschreiben herunterladen", data=cover_pdf, file_name="Motivationsschreiben.pdf", mime="application/pdf")
+    st.download_button("⬇️ Lebenslauf herunterladen", data=cv_pdf, file_name="Lebenslauf.pdf")
+    st.download_button("⬇️ Motivationsschreiben herunterladen", data=cover_pdf, file_name="Motivationsschreiben.pdf")
