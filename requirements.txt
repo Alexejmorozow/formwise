@@ -1,6 +1,7 @@
-streamlit>=1.25
+streamlit
 jinja2
+weasyprint
+Pillow
+openai
 requests
 beautifulsoup4
-openai
-pyppeteer
