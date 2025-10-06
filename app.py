@@ -1,152 +1,95 @@
 import streamlit as st
-from jinja2 import Template
-import openai
-import pdfkit
-from io import BytesIO
-import base64
+from jinja2 import Environment, FileSystemLoader
+from xhtml2pdf import pisa
+import io
 import os
-import json
-from PIL import Image
-import re
 
-st.set_page_config(page_title="FormWise – Bewerbungsgenerator", layout="wide")
+# === HTML Templates laden ===
+env = Environment(loader=FileSystemLoader("templates"))
 
-# -----------------------
-# GPT-4 Vision Analyse
-# -----------------------
-def analyze_screenshot_with_vision(api_key, image_bytes):
-    openai.api_key = api_key
-    image_b64 = base64.b64encode(image_bytes).decode('utf-8')
-    prompt = """
-    Analysiere diesen Screenshot und gib ein JSON zurück mit:
-    {
-      "primary_color": "#hexcode",
-      "secondary_colors": ["#hex1", "#hex2"],
-      "design_style": "modern/professional/creative",
-      "typography": "sans-serif/serif",
-      "tone": "formal/casual",
-      "style_keywords": ["word1","word2"]
-    }
-    """
-    try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4-vision-preview",
-            messages=[{
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": prompt},
-                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{image_b64}"}}
-                ]
-            }],
-            max_tokens=400
-        )
-        text = response.choices[0].message.content
-        match = re.search(r'\{.*\}', text, re.DOTALL)
-        if match:
-            return json.loads(match.group(0))
-    except Exception:
-        pass
-    return {
-        "primary_color": "#003366",
-        "secondary_colors": ["#006699", "#CCCCCC"],
-        "design_style": "corporate",
-        "typography": "sans-serif",
-        "tone": "formal",
-        "style_keywords": ["modern", "clean", "professional"]
-    }
+def render_pdf(template_name, context):
+    """Rendert HTML + erzeugt PDF"""
+    template = env.get_template(template_name)
+    html = template.render(context)
+    pdf_bytes = io.BytesIO()
+    pisa.CreatePDF(io.StringIO(html), dest=pdf_bytes)
+    return pdf_bytes.getvalue(), html
 
-# -----------------------
-# PDF Generator
-# -----------------------
-def render_pdf(template_path, context):
-    with open(template_path, "r", encoding="utf-8") as f:
-        html = Template(f.read()).render(**context)
-    pdf_bytes = pdfkit.from_string(html, False)
-    return BytesIO(pdf_bytes), html
 
-# -----------------------
-# UI
-# -----------------------
-st.title("📄 FormWise – Bewerbungsgenerator")
+# === Streamlit App ===
+st.set_page_config(page_title="Formwise – Bewerbungsgenerator", layout="wide")
+
+st.title("💼 Formwise – Bewerbungsgenerator für EBP")
+st.write("Erstelle ein einheitliches, ästhetisches Bewerbungsdossier mit wenigen Klicks.")
 
 with st.sidebar:
-    st.header("🔑 Einstellungen")
-    api_key = st.text_input("OpenAI API Key", type="password")
-    st.markdown("---")
-    uploaded_file = st.file_uploader("📷 Screenshot der Firmenwebsite", type=["png", "jpg", "jpeg"])
+    st.header("📋 Persönliche Angaben")
+    name = st.text_input("Name", "Alexej Morozow")
+    email = st.text_input("E-Mail", "alex.moroz@example.com")
+    phone = st.text_input("Telefon", "+41 79 123 45 67")
+    address = st.text_input("Adresse", "Zürich, Schweiz")
 
-if uploaded_file and api_key:
-    image = Image.open(uploaded_file)
-    st.image(image, caption="Hochgeladener Screenshot", use_column_width=True)
-    if st.button("🎨 Design analysieren"):
-        with st.spinner("Analysiere Website-Design..."):
-            result = analyze_screenshot_with_vision(api_key, uploaded_file.getvalue())
-            st.session_state["style"] = result
-            st.success("Analyse abgeschlossen!")
-            st.json(result)
+    st.header("🎯 Position")
+    position = st.text_input("Bewerbung als", "Organisationsentwickler")
+    company = st.text_input("Unternehmen", "EBP")
+    website = st.text_input("Unternehmens-URL", "https://www.ebp.global/ch-de")
 
-# -----------------------
-# Eingabedaten
-# -----------------------
-st.header("👤 Bewerbungsdaten")
+st.divider()
+st.subheader("🧾 Lebenslauf")
 
 col1, col2 = st.columns(2)
+
 with col1:
-    name = st.text_input("Name", "Alexej Morozow")
-    title = st.text_input("Titel", "Organisationsentwickler")
-    contact = st.text_area("Kontakt", "alexej.morozow@email.com | Zürich")
-    profile = st.text_area("Profil", "Erfahrener Organisationsentwickler mit Fokus auf Change Management.")
+    education = st.text_area("Ausbildung", "MAS Organisationsentwicklung, Universität Zürich\nBSc Sozialpädagogik, HSLU")
+    experience = st.text_area("Berufserfahrung", "Teamleiter, Wohnheim Zürich\nSozialpädagoge, Stiftung XY")
 with col2:
-    role = st.text_input("Rolle", "Organisationsentwickler")
-    experiences = st.text_area("Erfahrungen (je Zeile)", "EBP – Change Projekte\nPwC – Organisationsberatung").split("\n")
-    skills = st.text_area("Fähigkeiten (je Zeile)", "Kommunikation\nAgiles Arbeiten\nModeration").split("\n")
+    skills = st.text_area("Fähigkeiten", "Organisationsanalyse, Change Management, Kommunikation")
+    languages = st.text_area("Sprachen", "Deutsch (C2)\nEnglisch (C1)\nFranzösisch (B2)")
 
-# -----------------------
-# Bewerbungsbrief
-# -----------------------
-st.header("💬 Anschreiben")
-intro = st.text_area("Einleitung", "Mit großem Interesse habe ich Ihre Ausschreibung gelesen ...")
-body = st.text_area("Hauptteil", "Ich bringe langjährige Erfahrung in Veränderungsprozessen mit ...")
-closing = st.text_area("Schluss", "Ich freue mich auf ein persönliches Gespräch.")
+st.divider()
+st.subheader("💬 Motivationsschreiben")
+motivation_text = st.text_area(
+    "Text deines Motivationsschreibens",
+    "Sehr geehrte Damen und Herren,\n\n"
+    "Mit grossem Interesse bewerbe ich mich als Organisationsentwickler bei EBP..."
+)
 
-# -----------------------
-# PDF Generierung
-# -----------------------
-if st.button("📄 PDF generieren"):
-    style = st.session_state.get("style", {
-        "primary_color": "#003366",
-        "typography": "sans-serif"
-    })
+st.divider()
+
+if st.button("📄 Bewerbung generieren"):
     context_cv = {
         "name": name,
-        "title": title,
-        "contact": contact,
-        "profile": profile,
-        "experiences": experiences,
+        "email": email,
+        "phone": phone,
+        "address": address,
+        "education": education,
+        "experience": experience,
         "skills": skills,
-        "primary_color": style["primary_color"],
-        "font": "Helvetica Neue" if style["typography"] == "sans-serif" else "Georgia"
+        "languages": languages,
+        "company": company,
+        "position": position,
     }
+
     context_cover = {
         "name": name,
-        "role": role,
-        "intro": intro,
-        "body": body,
-        "closing": closing,
-        "primary_color": style["primary_color"],
-        "font": "Helvetica Neue" if style["typography"] == "sans-serif" else "Georgia"
+        "email": email,
+        "phone": phone,
+        "address": address,
+        "motivation_text": motivation_text,
+        "company": company,
+        "position": position,
     }
 
-    with st.spinner("Erstelle PDFs..."):
-        cv_pdf, cv_html = render_pdf("templates/cv_template.html", context_cv)
-        cover_pdf, cover_html = render_pdf("templates/cover_template.html", context_cover)
+    cv_pdf, cv_html = render_pdf("cv_template.html", context_cv)
+    cover_pdf, cover_html = render_pdf("cover_template.html", context_cover)
 
-        st.success("✅ PDFs erstellt!")
+    st.success("✅ Bewerbung erfolgreich erstellt!")
 
-        st.download_button("📥 Lebenslauf herunterladen", data=cv_pdf, file_name="Lebenslauf.pdf", mime="application/pdf")
-        st.download_button("📥 Anschreiben herunterladen", data=cover_pdf, file_name="Anschreiben.pdf", mime="application/pdf")
+    st.subheader("📄 Vorschau – Lebenslauf")
+    st.components.v1.html(cv_html, height=800, scrolling=True)
 
-        with st.expander("👁️ Lebenslauf Vorschau"):
-            st.markdown(cv_html, unsafe_allow_html=True)
-        with st.expander("👁️ Anschreiben Vorschau"):
-            st.markdown(cover_html, unsafe_allow_html=True)
+    st.subheader("📄 Vorschau – Motivationsschreiben")
+    st.components.v1.html(cover_html, height=800, scrolling=True)
+
+    st.download_button("⬇️ Lebenslauf herunterladen", data=cv_pdf, file_name="Lebenslauf.pdf", mime="application/pdf")
+    st.download_button("⬇️ Motivationsschreiben herunterladen", data=cover_pdf, file_name="Motivationsschreiben.pdf", mime="application/pdf")
