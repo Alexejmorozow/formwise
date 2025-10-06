@@ -1,0 +1,28 @@
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body {
+    font-family: '{{ font }}', sans-serif;
+    margin: 2cm;
+    color: #000;
+  }
+  h1 {
+    color: {{ primary_color }};
+  }
+  h2 {
+    color: {{ primary_color }};
+    border-bottom: 2px solid {{ primary_color }};
+    padding-bottom: 4px;
+  }
+</style>
+</head>
+<body>
+  <h1>Bewerbung als {{ role }}</h1>
+  <p>Sehr geehrte Damen und Herren,</p>
+  <p>{{ intro }}</p>
+  <p>{{ body }}</p>
+  <p>{{ closing }}</p>
+  <p>Freundliche Grüsse,<br>{{ name }}</p>
+</body>
+</html>
