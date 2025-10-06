@@ -1,7 +1,7 @@
 streamlit
 jinja2
-weasyprint
-Pillow
 openai
-requests
+pdfkit
+pillow
 beautifulsoup4
+requests
